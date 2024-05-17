@@ -1,0 +1,34 @@
+package com.lcwd.userservice.controllers;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+interface changer<T> {
+	
+	T change(T t);
+}
+
+public class Test {
+	
+	
+	public static void main(String[] a) {
+		
+	
+		//changer<String> fun = String::length;
+		
+		changer<String> fun2 = s -> s;
+		
+		//changer fun3 = ()-> "ABC";
+		
+		//changer fun4 = String::toLowerCase;
+		
+		
+		
+		
+	}
+
+	
+	
+}

@@ -1,0 +1,32 @@
+package com.lcwd.userservice.controllers;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+
+interface changer<T> {
+	
+	T change(T t);
+}
+
+public class Test {
+	
+	
+	public static void main(String[] a) {
+		
+	
+		BiFunction<String, String, String> fun = (str1, str2) -> str1 + str2;
+		
+		String result = null;
+		
+		result = fun.apply("10", "20");
+		System.out.println(result);
+		
+		
+	}
+
+	
+	
+}

@@ -1,0 +1,17 @@
+package com.lcwd.userservice;
+
+import org.springframework.context.annotation.Configuration;
+
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+
+@Configuration
+public class FeginClientInterceptor implements RequestInterceptor {
+
+	@Override
+	public void apply(RequestTemplate template) {
+
+	}
+
+	
+}

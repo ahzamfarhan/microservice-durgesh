@@ -1,0 +1,35 @@
+package com.lcwd.userservice.controllers;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+
+interface changer<T> {
+	
+	T change(T t);
+}
+
+public class Test {
+	
+	
+	public static void main(String[] a) {
+		
+		LocalDate xmas = LocalDate.of(2017, 12, 25);
+		
+		LocalDate blackFriday = LocalDate.of(2017, 11, 24);
+		
+		long monthsleft = ChronoUnit.MONTHS.between(xmas, blackFriday);
+		
+		System.out.println(monthsleft);		
+		
+		
+	}
+
+	
+	
+}

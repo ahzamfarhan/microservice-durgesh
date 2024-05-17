@@ -1,0 +1,160 @@
+package com.lcwd.userservice.services.impls;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.lcwd.userservice.entities.User;
+import com.lcwd.userservice.exceptions.UserNotFoundException;
+import com.lcwd.userservice.feign_clients.HotelClientService;
+import com.lcwd.userservice.feign_clients.RatingClientService;
+import com.lcwd.userservice.models.Hotel;
+import com.lcwd.userservice.models.Rating;
+import com.lcwd.userservice.repositories.UserRepository;
+import com.lcwd.userservice.services.UserService;
+
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
+@Transactional
+public class UserServiceImpl implements UserService {
+
+	private UserRepository userRepository;
+	private RestTemplate restTemplate;
+	private RatingClientService ratingClientService;
+	private HotelClientService hotelClientService;
+	
+	
+	@Override
+	public User saveUser(User user) {
+		
+		String userId = UUID.randomUUID().toString();
+		user.setUserId(userId);
+		user.getRatings().forEach(ratingClientService::create);
+		return userRepository.save(user);
+	}
+
+	@Override
+	public List<User> getAllUsers() {
+		List<User> users = userRepository.findAll();
+		//users.forEach(this::getRatings);
+
+		//Using OpenFeign Client
+		users.forEach(this::getRatingByOpenFeign);
+		
+		return userRepository.findAll();
+	}
+
+	@Override
+	public User getUserByEmail(String email) {
+		
+		ResponseEntity<List<Rating>> ratingListResponse = restTemplate.exchange(
+				"http://APPLE/ratings/users/{userId}", 
+				HttpMethod.GET, 
+				new HttpEntity<String>(""), 
+				new ParameterizedTypeReference<List<Rating>>() {}, "");
+		
+		return userRepository.findByEmail(email);
+	}
+
+	@Override
+	public User getUserById(String userId) {
+		User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException());
+		
+		/*
+		 * Using RestTemplate
+		 */
+		//getRatings(user);
+		
+		getRatingByOpenFeign(user);
+		 
+		return user;
+	}
+
+	@Override
+	public User updateUser(User user) {
+		
+		User dbUser = getUserById(user.getUserId());
+		
+		dbUser.setAbout(user.getAbout());
+		dbUser.setEmail(user.getEmail());
+		dbUser.setName(user.getName());
+		
+		return userRepository.save(user);
+	}
+	
+	@Override
+	public void deleteUser(String userId) {
+		userRepository.deleteById(userId);
+	}
+	
+	@Override
+	public void deleteUserByEmail(String email) {
+		userRepository.deleteByEmail(email);
+	}
+	
+	
+	public void getRatings(User user) {
+
+		//Reference from https://gist.github.com/dileeph/c5f9eae2f971d91e1dda
+		ResponseEntity<List<Rating>> ratingListResponse = restTemplate.exchange(
+						"http://RATINGSERVICE/ratings/users/{userId}", 
+						HttpMethod.GET, 
+						new HttpEntity<String>(user.getUserId()), 
+						new ParameterizedTypeReference<List<Rating>>() {}, user.getUserId());
+		
+		//Check if response is null or empty
+		if(ratingListResponse != null && ratingListResponse.hasBody()) {
+			
+			//Setting the rating to User.
+			user.setRatings(ratingListResponse.getBody());
+		}
+		
+		
+		user.getRatings().forEach(rating->{
+			
+			ResponseEntity<Hotel> hotelResponse = restTemplate.exchange(
+														"http://HOTELSERVICE/hotels/{hotelId}", 
+														HttpMethod.GET,
+														new HttpEntity<String>(rating.getHotelId()),
+														Hotel.class, rating.getHotelId());
+			
+			//Check if response is null or empty
+			if(hotelResponse !=null && hotelResponse.hasBody()) {
+				
+				//Setting Hotel to given Rating
+				rating.setHotel(hotelResponse.getBody());
+			}
+		});
+		
+	}
+	
+	public void getRatingByOpenFeign(User user) {
+		
+		 ResponseEntity<List<Rating>> ratingResponseEntity = ratingClientService.getRatingByUserId(user.getUserId());
+			
+		 if(ratingResponseEntity != null && ratingResponseEntity.hasBody()) {
+			 user.setRatings(ratingResponseEntity.getBody());
+			 
+			 user.getRatings().forEach(rating->{
+				 
+				 ResponseEntity<Hotel> hotelEntityResponse = hotelClientService.getById(rating.getHotelId());
+				 
+				 if(hotelEntityResponse != null && hotelEntityResponse.hasBody()) {
+					 rating.setHotel(hotelEntityResponse.getBody());
+				 }
+			 });
+			 
+		 }
+		
+	}
+
+}

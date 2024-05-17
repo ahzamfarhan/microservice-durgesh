@@ -1,0 +1,24 @@
+package com.lcwd.userservice.controllers;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class animal {
+	
+}
+
+class dog extends animal{}
+
+public class Test {
+	
+	
+	public static void main(String[] a) {
+		
+		List<dog> c2 = new ArrayList<dog>();
+		List<animal> c3 =new ArrayList<dog>();
+		List<Object> c4 = new ArrayList<animal>();
+		
+	}
+
+	
+}

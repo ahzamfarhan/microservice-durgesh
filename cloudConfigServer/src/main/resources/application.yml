@@ -1,0 +1,30 @@
+server:
+ port:6666
+
+spring:
+ application:
+  name: cloudConfigServer
+ cloud:
+  config:
+   server:
+    git:
+     uri: https://github.com/ahzamfarhan/durgeshconfig 
+     clone-on-start: true
+     default-label: main
+
+
+#eureka:
+# instance:
+#  prefer-ip-address: true
+# register-with-eureka: false
+# fetch-registry: false
+# service-url:
+#  default-zone: http://localhost:8761/eureka/
+# server:
+#  waitTimeInMsWhenSyncEmpty: 0  
+
+management:
+ security:
+  enabled: true   
+  
+  

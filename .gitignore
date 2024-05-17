@@ -1,0 +1,15 @@
+# Eclipse files
+.project
+.classpath
+.settings/
+bin/
+target/
+
+# Compiled files
+*.class
+*.jar
+
+# Other files to ignore
+*.log
+*.tmp
+*.swp

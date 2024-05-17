@@ -1,0 +1,28 @@
+package com.lcwd.userservice.controllers;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+class animal {
+	
+}
+
+
+public class Test {
+	
+	
+	public static void main(String[] a) {
+		
+		
+		Duration due = Duration.ofDays(-3);
+		
+		LocalDate ld = LocalDate.of(2016, 1,1);
+		
+		System.out.println(due.toDays());
+	}
+
+	
+	
+}

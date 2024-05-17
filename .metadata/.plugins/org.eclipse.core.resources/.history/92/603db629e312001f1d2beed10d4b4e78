@@ -1,0 +1,5 @@
+package com.lcwd.apiGateway.configs;
+
+public class SecurityConfig {
+
+}
